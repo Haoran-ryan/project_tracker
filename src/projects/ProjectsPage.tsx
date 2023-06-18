@@ -33,11 +33,24 @@ const ProjectsPage = () => {
 
 
     const saveProject = (project:Project)=>{
-        console.log("Saving Project", project);
-        let updatedProjects = projects.map((p: Project) => {
-             return p.id === project.id ? project : p;
-          });
-            setProjects(updatedProjects);
+        // console.log("Saving Project", project);
+        // let updatedProjects = projects.map((p: Project) => {
+        //      return p.id === project.id ? project : p;
+        //   });
+        //     setProjects(updatedProjects);
+        projectAPI
+            .put(project)
+            .then((updatedProject)=>{
+                let updatedProjects = projects.map((p: Project) => {
+                    return p.id === project.id ? new Project(updatedProject) : p;
+                });
+                setProjects(updatedProjects);
+            })
+            .catch((e)=>{
+                if(e instanceof Error){
+                    setError(e.message)
+                }
+            })
     };
 
     const handleMoreClick = ()=>{
@@ -57,7 +70,7 @@ const ProjectsPage = () => {
                     </section>
                 </div>
             )}
-            
+
             <ProjectList
             onSave={ saveProject }
             projects={projects}/>
