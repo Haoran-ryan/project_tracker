@@ -8,15 +8,19 @@ const ProjectsPage = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string|undefined>(undefined);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         setLoading(true);
         projectAPI
-            .get(1)
+            .get(currentPage)
             .then((data)=>{
                 setError('');
                 setLoading(false);
-                setProjects(data);
+                if(currentPage ===1){
+                    setProjects(data)
+                }setProjects((projects)=>[...projects, ...data])
+
             })
             .catch((e)=>{
                 setLoading(false);
@@ -25,7 +29,7 @@ const ProjectsPage = () => {
                     setError(e.message)
                 }
             });
-    }, []);
+    }, [currentPage]);
 
 
     const saveProject = (project:Project)=>{
@@ -35,6 +39,10 @@ const ProjectsPage = () => {
           });
             setProjects(updatedProjects);
     };
+
+    const handleMoreClick = ()=>{
+        setCurrentPage((currentPage)=>currentPage+1)
+    }
 
     return(
         <>
@@ -49,9 +57,23 @@ const ProjectsPage = () => {
                     </section>
                 </div>
             )}
-            <ProjectList 
+            
+            <ProjectList
             onSave={ saveProject }
             projects={projects}/>
+
+            {!loading && ! error && (
+                <div className="row">
+                    <div className="col-sm-12">
+                        <div className="button-group fluid">
+                            <button className="button default" onClick={ handleMoreClick }>
+                                More...
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {loading &&(
                 <div className="center-page">
                     <span className="spinner primary"></span>
